@@ -9,6 +9,9 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+//host static files
+app.use(express.static("src/public"));
+
 // Routes
 app.use("/mail", MailRouter);
 
