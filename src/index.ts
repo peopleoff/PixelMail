@@ -1,5 +1,4 @@
 import express, { Express, Request, Response } from "express";
-import { Resend } from "resend";
 import dotenv from "dotenv";
 import { processTemplate } from "./utils/templates";
 import { sendEmail } from "./services/resend";
@@ -7,7 +6,6 @@ dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Middleware to parse JSON bodies
 app.use(express.json());
