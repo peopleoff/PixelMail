@@ -1,7 +1,6 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import dotenv from "dotenv";
-import { processTemplate } from "./utils/templates";
-import { sendEmail } from "./services/resend";
+import MailRouter from "./routes/mail";
 dotenv.config();
 
 const app: Express = express();
@@ -10,21 +9,8 @@ const port = process.env.PORT || 3000;
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-app.get("/", async (req: Request, res: Response) => {
-  res.send("Hello World");
-});
-
-app.post("/", async (req: Request, res: Response) => {
-  try {
-    const emailData = req.body.email;
-    const templateData = req.body.data;
-    const htmlToSend = processTemplate(emailData.templateId, templateData);
-    const emailResult = sendEmail(emailData.to, emailData.subject, htmlToSend);
-    return emailResult;
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
+// Routes
+app.use("/mail", MailRouter);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
