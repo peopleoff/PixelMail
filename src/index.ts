@@ -12,19 +12,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-app.get("/", async (req: Request, res: Response) => {
-  const { data, error } = await resend.emails.send({
-    from: "noreply@pixeldevs.digital",
-    to: "antonio@pixeldevs.digital",
-    subject: "Idk man seems to work fine",
-    html: "<p>Okay done</p>",
-  });
-  if (error) {
-    res.status(500).json({ error });
-  }
-  res.json(data);
-});
-
 app.post("/", async (req: Request, res: Response) => {
   try {
     const htmlToSend = processTemplate(2, req.body);
