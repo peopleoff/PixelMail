@@ -1,4 +1,5 @@
 import express, { Express } from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import MailRouter from "./routes/mail";
 dotenv.config();
@@ -6,9 +7,9 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json());
-
+app.use(cors());
 //host static files
 app.use(express.static("src/public"));
 
