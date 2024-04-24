@@ -5,6 +5,8 @@ const templateIdToNameMap: { [key: string]: string } = {
   1: "test.html",
   2: "basic.html",
   3: "contactForm.hbs",
+  4: "rocket-health-generic.html",
+  5: "rocket-health-contact.hbs",
 };
 
 /**

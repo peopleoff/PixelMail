@@ -20,6 +20,6 @@ export async function sendMail(req: Request, res: Response) {
     }
     res.json({ result: "success", id: emailResult.id });
   } catch (error) {
-    res.status(500).json({ error: String(error) });
+    res.status(500).json({ error: error });
   }
 }
