@@ -1,30 +1,34 @@
-FROM node as builder
+# Stage 1: Build the project
+FROM node:20-alpine AS build
 
-# Create app directory
-WORKDIR /usr/src/app
+# Set working directory inside the container
+WORKDIR /app
 
-# Install app dependencies
+# Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
-RUN npm ci
+# Install dependencies
+RUN npm install
 
+# Copy the rest of the application code
 COPY . .
 
+# Build the TypeScript project
 RUN npm run build
 
-FROM node:slim
+# Stage 2: Run the project
+FROM node:20-alpine
 
-ENV NODE_ENV production
-USER node
+# Set working directory for runtime
+WORKDIR /app
 
-# Create app directory
-WORKDIR /usr/src/app
+# Copy only the necessary files from the build stage
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/package*.json ./
 
-# Install app dependencies
-COPY package*.json ./
-
-RUN npm ci --omit=dev
-
-COPY --from=builder /usr/src/app/dist ./dist
-
+# Expose port (make sure this matches the port in your app)
 EXPOSE 3000
+
+# Command to run your app
+CMD ["node", "dist/index.js"]
