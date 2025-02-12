@@ -2,7 +2,16 @@ import * as Handlebars from "handlebars";
 
 // Register a helper that returns the current timestamp
 Handlebars.registerHelper("timestamp", function () {
-  return new Date().toLocaleString(); // You can customize this format
+  const timestamp = new Date().toLocaleString(); // You can customize this format
+  return new Date(timestamp).toLocaleString("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: 'numeric',
+    hour12: true
+  });
 });
 
 // Register a helper to format key names

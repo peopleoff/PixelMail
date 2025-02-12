@@ -7,7 +7,8 @@ const templateIdToNameMap: { [key: string]: string } = {
   3: "contactForm.hbs",
   4: "rocket-health-generic.html",
   5: "rocket-health-contact.hbs",
-  6: 'rocket-health-lead-thankyou.html'
+  6: "rocket-health-lead-thankyou.html",
+  7: "rocket-health-profile-request.hbs",
 };
 
 /**
