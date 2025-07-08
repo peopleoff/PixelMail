@@ -1,0 +1,213 @@
+openapi: 3.0.3
+info:
+  title: PixelMail API
+  description: A TypeScript-based email sending API service that uses Handlebars templates and the Resend service for reliable email delivery.
+  version: 1.0.0
+  contact:
+    name: PixelDevs
+    email: noreply@pixeldevs.digital
+  license:
+    name: ISC
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.pixeldevs.digital
+    description: Production server
+
+paths:
+  /mail/send:
+    post:
+      summary: Send email using template
+      description: Sends an email to a specified recipient using a predefined Handlebars template with dynamic data injection.
+      operationId: sendEmail
+      tags:
+        - Email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+            examples:
+              basic_email:
+                summary: Basic email example
+                value:
+                  email:
+                    to: "recipient@example.com"
+                    templateId: 2
+                    subject: "Welcome to our service"
+                  data:
+                    firstName: "John"
+                    lastName: "Doe"
+              contact_form:
+                summary: Contact form email
+                value:
+                  email:
+                    to: "contact@company.com"
+                    templateId: 3
+                    subject: "New Contact Form Submission"
+                  data:
+                    firstName: "Jane"
+                    lastName: "Smith"
+                    email: "jane.smith@example.com"
+                    message: "I'm interested in your services"
+      responses:
+        '200':
+          description: Email sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEmailResponse'
+              examples:
+                success:
+                  summary: Successful email send
+                  value:
+                    result: "success"
+                    id: "28c3366a-7948-4498-893d-b59f652360b0"
+        '400':
+          description: Bad request - validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              examples:
+                validation_error:
+                  summary: Validation error example
+                  value:
+                    error:
+                      - message: "\"email.to\" must be a valid email"
+                        path: ["email", "to"]
+                        type: "string.email"
+                      - message: "\"email.templateId\" is required"
+                        path: ["email", "templateId"]
+                        type: "any.required"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                server_error:
+                  summary: Server error example
+                  value:
+                    error: "Failed to send email"
+
+components:
+  schemas:
+    SendEmailRequest:
+      type: object
+      required:
+        - email
+        - data
+      properties:
+        email:
+          $ref: '#/components/schemas/EmailConfig'
+        data:
+          $ref: '#/components/schemas/TemplateData'
+      example:
+        email:
+          to: "recipient@example.com"
+          templateId: 2
+          subject: "Hello World"
+        data:
+          firstName: "John"
+          customField: "Custom Value"
+
+    EmailConfig:
+      type: object
+      required:
+        - to
+        - templateId
+        - subject
+      properties:
+        to:
+          type: string
+          format: email
+          description: The recipient's email address
+          example: "recipient@example.com"
+        templateId:
+          type: integer
+          minimum: 1
+          maximum: 7
+          description: The ID of the email template to use
+          example: 2
+        subject:
+          type: string
+          minLength: 1
+          description: The subject line of the email
+          example: "Welcome to our service"
+
+    TemplateData:
+      type: object
+      description: Template variables for Handlebars template processing. Fields depend on the selected template.
+      additionalProperties: true
+      example:
+        firstName: "John"
+        lastName: "Doe"
+        customField: "Custom Value"
+
+    SendEmailResponse:
+      type: object
+      required:
+        - result
+        - id
+      properties:
+        result:
+          type: string
+          enum: ["success"]
+          description: Status of the email sending operation
+          example: "success"
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the sent email
+          example: "28c3366a-7948-4498-893d-b59f652360b0"
+
+    ValidationError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                description: Human-readable error message
+              path:
+                type: array
+                items:
+                  type: string
+                description: Path to the field that caused the error
+              type:
+                type: string
+                description: Type of validation error
+
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "Failed to send email"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for authentication (if implemented)
+
+tags:
+  - name: Email
+    description: Email sending operations
+
+externalDocs:
+  description: Find more info about PixelMail
+  url: https://github.com/pixeldevs/pixelmail
