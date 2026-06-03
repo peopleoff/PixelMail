@@ -1,34 +1,31 @@
 # Stage 1: Build the project
 FROM node:20-alpine AS build
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package files and install all deps (incl. dev deps for tsc)
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
+# Copy source and build
 COPY . .
-
-# Build the TypeScript project
 RUN npm run build
 
-# Stage 2: Run the project
+# Stage 2: Runtime
 FROM node:20-alpine
 
-# Set working directory for runtime
 WORKDIR /app
+ENV NODE_ENV=production
 
-# Copy only the necessary files from the build stage
+# Install production deps only
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy build output and runtime assets
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
+COPY --from=build /app/templates ./templates
+COPY --from=build /app/src/public ./src/public
 
-# Expose port (make sure this matches the port in your app)
 EXPOSE 3000
 
-# Command to run your app
 CMD ["node", "dist/index.js"]
